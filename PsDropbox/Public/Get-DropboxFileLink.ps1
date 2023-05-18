@@ -1,3 +1,8 @@
+<#
+.LINK
+https://www.dropbox.com/developers/documentation/http/documentation#files-get_temporary_link
+
+#>
 function Get-DropboxFileLink {
 
     [CmdletBinding()]
@@ -10,7 +15,6 @@ function Get-DropboxFileLink {
     )
 
     $Headers = @{
-        Accept = 'application/json'
         Authorization = 'Bearer ' + $ApiKey
     }
 

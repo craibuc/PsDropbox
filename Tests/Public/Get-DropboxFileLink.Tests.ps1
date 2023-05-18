@@ -53,11 +53,6 @@ Describe 'Get-DropboxFileLink' {
             Should -Invoke -CommandName Invoke-WebRequest -ParameterFilter { $ContentType -eq 'application/json' }
         }
 
-        It "uses the correct Accept header" {
-            # assert
-            Should -Invoke -CommandName Invoke-WebRequest -ParameterFilter { $Headers.Accept -eq 'application/json' }
-        }
-
         It "uses the correct Authorization header" {
             # assert
             Should -Invoke -CommandName Invoke-WebRequest -ParameterFilter {
