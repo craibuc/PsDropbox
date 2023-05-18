@@ -1,3 +1,7 @@
+<#
+.LINK
+https://www.dropbox.com/developers/documentation/http/documentation#files-list_folder
+#>
 function Get-DropboxFolder {
 
     [CmdletBinding()]
@@ -13,7 +17,6 @@ function Get-DropboxFolder {
     )
 
     $Headers = @{
-        Accept = 'application/json'
         Authorization = 'Bearer ' + $ApiKey
     }
 
