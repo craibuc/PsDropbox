@@ -1,0 +1,13 @@
+{
+    "paths_to_tags": [
+        {
+            "path": "/Prime_Numbers.txt",
+            "tags": [
+                {
+                    ".tag": "user_generated_tag",
+                    "tag_text": "my_tag"
+                }
+            ]
+        }
+    ]
+}

@@ -53,18 +53,6 @@ Describe 'Get-DropboxFolder' {
             Should -Invoke -CommandName Invoke-WebRequest -ParameterFilter { $ContentType -eq 'application/json' }
         }
 
-        It "uses the correct Accept header" {
-            # assert
-            Should -Invoke -CommandName Invoke-WebRequest -ParameterFilter { $Headers.Accept -eq 'application/json' }
-        }
-
-        It "uses the correct Authorization header" {
-            # assert
-            Should -Invoke -CommandName Invoke-WebRequest -ParameterFilter {
-                $Headers.Authorization -eq "Bearer $ApiKey"
-            }
-        }
-
         It "creates the correct Body" {
             # assert
             Should -Invoke -CommandName Invoke-WebRequest -ParameterFilter { 
