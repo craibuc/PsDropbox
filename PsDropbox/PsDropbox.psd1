@@ -70,8 +70,11 @@ Description = "A PowerShell module that wraps Dropbox's REST API."
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
-    'Get-DropboxFolder'
+    'Send-DropboxFile'
     'Get-DropboxFileLink'
+    'Add-DropboxFileTag','Get-DropboxFileTag','Remove-DropboxFileTag'
+    'Add-DropboxFolder','Get-DropboxFolder'
+    'Remove-DropboxFileFolder'
 )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
@@ -98,13 +101,13 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = @('dropbox','powershell')
 
         # A URL to the license for this module.
         # LicenseUri = ''
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/craibuc/PsDropbox'
 
         # A URL to an icon representing this module.
         # IconUri = ''
