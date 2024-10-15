@@ -7,7 +7,7 @@ function Add-DropboxFileTag {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [string]$ApiKey,
+        [string]$AccessToken,
 
         [Parameter(Mandatory)]
         [string]$Path,
@@ -17,7 +17,7 @@ function Add-DropboxFileTag {
     )
 
     $Headers = @{
-        Authorization = 'Bearer ' + $ApiKey
+        Authorization = 'Bearer ' + $AccessToken
     }
 
     $Data = @{
