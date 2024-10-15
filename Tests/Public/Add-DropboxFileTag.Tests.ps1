@@ -12,24 +12,49 @@ BeforeAll {
 
 Describe 'Add-DropboxFileTag' {
 
-    BeforeEach {
+    Context "Parameter validation" {
 
-        # arrange
-        $ApiKey = '2134d8d5-d1b4-4a1d-89ac-f44a96514bb5'
-        $Path = "/Homework/math/Prime_Numbers.txt"
-        $Tag = 'lorem'
-
-    }
-
+        BeforeAll {
+          $Command = Get-Command "Add-DropboxFileTag"
+        }
+    
+        $Parameters = @(
+            @{Name='AccessToken';Type='string';Mandatory=$true}
+            @{Name='Path';Type='string';Mandatory=$true}
+            @{Name='Tag';Type='string';Mandatory=$true}
+        )
+    
+        Context 'Type' {
+            it '<Name> is a <Type>' -TestCases $Parameters {
+                param($Name, $Type, $Mandatory)
+              
+                $Command | Should -HaveParameter $Name -Type $type
+            }    
+        }
+    
+        Context 'Type' {
+            it '<Name> mandatory is <Mandatory>' -TestCases $Parameters {
+                param($Name, $Type, $Mandatory)
+              
+                if ($Mandatory) { $Command | Should -HaveParameter $Name -Mandatory }
+                else { $Command | Should -HaveParameter $Name -Not -Mandatory }
+            }    
+        }
+        
+      } # /context
+    
     Context "Request" {
-
+    
         BeforeEach {
+            # arrange
+            $AccessToken = '2134d8d5-d1b4-4a1d-89ac-f44a96514bb5'
+            $Path = "/Homework/math/Prime_Numbers.txt"
+            $Tag = 'lorem'
 
             Mock Invoke-WebRequest {}
 
             # act
-            Add-DropboxFileTag -ApiKey $ApiKey -Path $Path -Tag $Tag
-
+            Add-DropboxFileTag -AccessToken $AccessToken -Path $Path -Tag $Tag
         }
 
         It "uses the correct Uri" {
@@ -50,7 +75,7 @@ Describe 'Add-DropboxFileTag' {
         It "uses the correct Authorization header" {
             # assert
             Should -Invoke -CommandName Invoke-WebRequest -ParameterFilter {
-                $Headers.Authorization -eq "Bearer $ApiKey"
+                $Headers.Authorization -eq "Bearer $AccessToken"
             }
         }
 
