@@ -13,32 +13,37 @@ function New-DropboxFolder {
         [string]$Path,
 
         [Parameter()]
-        [bool]$AutoRename
+        [switch]$AutoRename,
+
+        [string]$SelectUser,
+        [string]$RootFolderId
     )
 
-    $Uri = 'https://api.dropboxapi.com/2/files/create_folder_v2'
+    Write-Debug "AccessToken: $AccessToken"
+    Write-Debug "Path: $Path"
+    Write-Debug "AutoRename: $AutoRename"
+    Write-Debug "SelectUser: $SelectUser"
+    Write-Debug "RootFolderId: $RootFolderId"
 
     $Headers = @{
         Authorization = "Bearer $AccessToken"
     }
 
+    if ($SelectUser) {$Headers['Dropbox-API-Select-User']=$SelectUser}
+    if ($RootFolderId) {$Headers['Dropbox-API-Path-Root']=@{'.tag'='root'; root=$RootFolderId} | ConvertTo-Json -Compress}
+
     $Body = @{
         path = $Path
-        autorename = $AutoRename
+        autorename = [bool]$AutoRename
     } | ConvertTo-Json
+    Write-Debug $Body
 
     if ($PSCmdlet.ShouldProcess($Path, "New-DropboxFolder")) {
 
-        $Response = Invoke-WebRequest -Uri $Uri -Body $Body -Headers $Headers -Method Post -ContentType 'application/json'
+        $Response = Invoke-WebRequest -Uri 'https://api.dropboxapi.com/2/files/create_folder_v2' -Body $Body -Headers $Headers -Method Post -ContentType 'application/json'
 
         if ($Response.Content) {
-    
-            # convert JSON to Hashtable
-            $Content = $Response.Content | ConvertFrom-Json
-    
-            # return data
-            $Content
-    
+            $Response.Content | ConvertFrom-Json
         }
     
     }
