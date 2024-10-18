@@ -18,6 +18,8 @@ Describe 'Test-DropboxAccessToken' {
 
     $Parameters = @(
         @{Name='AccessToken';Type='string';Mandatory=$true}
+        @{Name='SelectUser';Type='string';Mandatory=$false}
+        @{Name='RootFolderId';Type='string';Mandatory=$false}
     )
 
     Context 'Type' {
@@ -82,5 +84,42 @@ Describe 'Test-DropboxAccessToken' {
         }
     }
 
+    Context 'when the SelectUser parameter is supplied' {
+
+        BeforeEach {
+            # arrange
+            Mock Invoke-WebRequest {}
+            # act
+            Test-DropboxAccessToken -AccessToken $AccessToken -SelectUser 'SelectUser'
+        }
+
+        It "adds the Dropbox-API-Select-User header" {
+            # assert
+            Should -Invoke -CommandName Invoke-WebRequest -ParameterFilter {
+                $Headers.'Dropbox-API-Select-User' -eq 'SelectUser'
+            }
+        }
+
+    }
+
+    Context 'when the RootFolderId parameter is supplied' {
+
+        BeforeEach {
+            # arrange
+            Mock Invoke-WebRequest {}
+            # act
+            Test-DropboxAccessToken -AccessToken $AccessToken -RootFolderId 'RootFolderId'
+        }
+
+        It "adds the Dropbox-API-Path-Root header" {
+            # assert
+            Should -Invoke -CommandName Invoke-WebRequest -ParameterFilter {
+                $Headers.'Dropbox-API-Path-Root' -eq @{root = 'RootFolderId'} | ConvertTo-Json -Compress
+            }
+        }
+
+    }
+
   }
+
 }
