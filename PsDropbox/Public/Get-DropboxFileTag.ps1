@@ -7,36 +7,20 @@ function Get-DropboxFileTag {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [string]$ApiKey,
+        [string]$AccessToken,
 
         [Parameter(Mandatory)]
         [string[]]$Path
     )
 
     $Headers = @{
-        Authorization = 'Bearer ' + $ApiKey
+        Authorization = 'Bearer ' + $AccessToken
     }
 
-    $Data = @{
-        paths = $Path
-    }
-
-    $Body = $Data | ConvertTo-Json
-    Write-Debug $Body
-
-    $Uri = 'https://api.dropboxapi.com/2/files/tags/get'
-    Write-Debug "Uri: $Uri"
-
-    $Response = Invoke-WebRequest -Uri $Uri -Body $Body -Headers $Headers -Method Post -ContentType 'application/json'
+    $Response = Invoke-WebRequest -Uri 'https://api.dropboxapi.com/2/files/tags/get' -Body ( @{paths = $Path} | ConvertTo-Json ) -Headers $Headers -Method Post -ContentType 'application/json'
 
     if ($Response.Content) {
-
-        # convert JSON to Hashtable
-        $Content = $Response.Content | ConvertFrom-Json
-
-        # return data
-        $Content
-
+        $Response.Content | ConvertFrom-Json
     }
 
 }
