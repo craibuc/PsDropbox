@@ -12,7 +12,7 @@
 RootModule = 'PsDropbox.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.0'
+ModuleVersion = '0.2.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -70,11 +70,14 @@ Description = "A PowerShell module that wraps Dropbox's REST API."
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
+    'Get-DropboxAccessToken','Test-DropboxAccessToken'
+    'Test-DropboxApp'
     'Send-DropboxFile'
     'Get-DropboxFileLink'
     'Add-DropboxFileTag','Get-DropboxFileTag','Remove-DropboxFileTag'
-    'Add-DropboxFolder','Get-DropboxFolder'
-    'Remove-DropboxFileFolder'
+    'New-DropboxFolder','Get-DropboxFolder', 'Get-DropboxTeamFolder', 'Get-DropboxTeamNamespace'
+    'Get-DropboxItemMeta','Move-DropboxItem','Remove-DropboxItem'
+    'Test-DropboxPath'
 )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
