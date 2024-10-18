@@ -12,10 +12,43 @@ BeforeAll {
 
 Describe 'Get-DropboxFolder' {
 
+    Context "Parameter validation" {
+
+        BeforeAll {
+          $Command = Get-Command "Get-DropboxFolder"
+        }
+    
+        $Parameters = @(
+            @{Name='AccessToken';Type='string';Mandatory=$true}
+            @{Name='Path';Type='string';Mandatory=$true}
+            @{Name='Recursive';Type='switch';Mandatory=$false}
+            @{Name='SelectUser';Type='string';Mandatory=$false}
+            @{Name='RootFolderId';Type='string';Mandatory=$false}
+        )
+    
+        Context 'Type' {
+            it '<Name> is a <Type>' -TestCases $Parameters {
+                param($Name, $Type, $Mandatory)
+              
+                $Command | Should -HaveParameter $Name -Type $type
+            }    
+        }
+    
+        Context 'Mandatory' {
+            it '<Name> mandatory is <Mandatory>' -TestCases $Parameters {
+                param($Name, $Type, $Mandatory)
+              
+                if ($Mandatory) { $Command | Should -HaveParameter $Name -Mandatory }
+                else { $Command | Should -HaveParameter $Name -Not -Mandatory }
+            }    
+        }
+        
+    } # /context
+
     BeforeEach {
 
         # arrange
-        $ApiKey = '2134d8d5-d1b4-4a1d-89ac-f44a96514bb5'
+        $AccessToken = '2134d8d5-d1b4-4a1d-89ac-f44a96514bb5'
         $Path = '/'
 
     }
@@ -34,7 +67,7 @@ Describe 'Get-DropboxFolder' {
             }
 
             # act
-            Get-DropboxFolder -ApiKey $Api-ApiKey -Path $Path
+            Get-DropboxFolder -AccessToken $AccessToken -Path $Path
 
         }
 
@@ -69,7 +102,7 @@ Describe 'Get-DropboxFolder' {
 
             BeforeEach {
                 # act
-                Get-DropboxFolder -ApiKey $Api-ApiKey -Path $Path -Recursive
+                Get-DropboxFolder -AccessToken $AccessToken -Path $Path -Recursive
             }
 
             It "creates the correct Body" {
@@ -111,7 +144,7 @@ Describe 'Get-DropboxFolder' {
             }  -ParameterFilter { $Uri -eq 'https://api.dropboxapi.com/2/files/list_folder' }
 
             # act
-            Get-DropboxFolder -ApiKey $ApiKey -Path $Path
+            Get-DropboxFolder -AccessToken $AccessToken -Path $Path
 
         }
 

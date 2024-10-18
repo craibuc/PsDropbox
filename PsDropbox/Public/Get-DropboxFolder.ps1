@@ -7,19 +7,26 @@ function Get-DropboxFolder {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [string]$ApiKey,
+        [Alias('access_token')]
+        [string]$AccessToken,
 
-        [Parameter()]
+        [Parameter(Mandatory)]
         [string]$Path,
 
         [Parameter()]
-        [switch]$Recursive
+        [switch]$Recursive,
+
+        [string]$SelectUser,
+        [string]$RootFolderId
     )
 
     $Headers = @{
-        Authorization = 'Bearer ' + $ApiKey
+        Authorization = 'Bearer ' + $AccessToken
     }
 
+    if ($SelectUser) {$Headers['Dropbox-API-Select-User']=$SelectUser}
+    if ($RootFolderId) {$Headers['Dropbox-API-Path-Root']=@{'.tag'='root'; root=$RootFolderId} | ConvertTo-Json -Compress}
+    
     $Data = @{
         path = $Path
     }
