@@ -1,4 +1,15 @@
 <#
+.SYNOPSIS
+Send a file to Dropbox.
+
+.PARAMETER AccessToken
+
+.PARAMETER Source
+Path to the local file.
+
+.PARAMETER Destination
+Path to the remote file (includes path and filename).
+
 .LINK
 https://www.dropbox.com/developers/documentation/http/documentation#files-upload
 #>
@@ -48,17 +59,8 @@ function Send-DropboxFile {
 
     Write-Debug $Headers
 
-    $Uri = 'https://content.dropboxapi.com/2/files/upload'
-    Write-Debug "Uri: $Uri"
-
     if ($PSCmdlet.ShouldProcess("$Source --> $Destination", "Send-DropboxFile")) {
-
-        $Response = Invoke-WebRequest -Uri $Uri -Headers $Headers -Method Post -ContentType 'application/octet-stream' -InFile $Source
-
-        if ($Response.Content) {
-            $Response.Content | ConvertFrom-Json
-        }
-    
+        Send-Request -Path 'files/upload' -Headers $Headers -InFile $Source
     }
 
 }
