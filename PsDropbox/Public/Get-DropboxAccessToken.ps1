@@ -53,19 +53,24 @@ Create an access_code:
 function Get-DropboxAccessToken {
     [CmdletBinding()]
     param (
-        [Parameter()]
+        [Parameter(Mandatory)]
         [string]$client_id,
 
-        [Parameter()]
+        [Parameter(Mandatory)]
         [string]$client_secret,
 
-        [Parameter(ParameterSetName='Initial')]
+        [Parameter(Mandatory,ParameterSetName='Initial')]
         [string]$access_code,
 
-        [Parameter(ParameterSetName='Refresh')]
+        [Parameter(Mandatory,ParameterSetName='Refresh')]
         [string]$refresh_token
 
     )
+
+    Write-Debug "client_id: $client_id"
+    Write-Debug "client_secret: $client_secret"
+    Write-Debug "access_code: $access_code"
+    Write-Debug "refresh_token: $refresh_token"
 
     $Body = switch ($PSCmdlet.ParameterSetName) {
         'Initial' { 
@@ -89,14 +94,15 @@ function Get-DropboxAccessToken {
     
     try {
         $Response = Invoke-WebRequest -Uri 'https://api.dropboxapi.com/oauth2/token' -Method Post -Body $Body -ContentType 'application/x-www-form-urlencoded'
-        $Content = $Response.Content | ConvertFrom-Json
-        $Content | Add-Member -Type NoteProperty -Name 'expires_at' -Value (Get-Date).AddSeconds($Content.expires_in).ToString('O') -Force
-        Write-Debug ($Content | ConvertTo-Json)
-        $Content
+        if ($Response.Content) {
+            $Content = $Response.Content | ConvertFrom-Json
+            $Content | Add-Member -Type NoteProperty -Name 'expires_at' -Value (Get-Date).AddSeconds($Content.expires_in).ToString('O') -Force
+            Write-Debug ($Content | ConvertTo-Json)
+            $Content
+        }
     }
     catch {
-        Write-Host ("ERROR: {0}" -f $_.Exception.Message) -ForegroundColor Red
-        throw
+        throw $_
     }
-    
+
 }
