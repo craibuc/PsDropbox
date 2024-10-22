@@ -11,8 +11,9 @@ The request's headers.
 .PARAMETER Data
 The data that will be JSON serialized as the request's body.
 
-.PARAMETER Retries
-The total number of attempts when a Too Many Requests [429] is encountered.
+.PARAMETER InFile
+The path to the file to be sent to Dropbox.
+
 #>
 function Send-Request {
 
@@ -24,10 +25,11 @@ function Send-Request {
     [Parameter(Mandatory)]
     [hashtable]$Headers,
 
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory,ParameterSetName='Data')]
     [hashtable]$Data,
 
-    [int]$Retries = 3
+    [Parameter(Mandatory,ParameterSetName='File')]
+    [string]$InFile
   )
 
   begin {
@@ -43,6 +45,8 @@ function Send-Request {
     $Body = $Data | ConvertTo-Json
     Write-Debug $Body
 
+    [int]$Retries = 3
+
   }
 
   process {
@@ -55,7 +59,12 @@ function Send-Request {
 
         Write-Debug "Retry: $Retry"
 
-        $Response = Invoke-WebRequest -Method Post -Uri $Uri -Body $Body -Headers $Headers -ContentType 'application/json'
+        $Response = if ( $PSCmdlet.ParameterSetName -eq 'File' ) {
+          Invoke-WebRequest -Method Post -Uri $Uri -InFile $InFile -Headers $Headers -ContentType 'application/octet-stream'
+        }
+        else {
+          Invoke-WebRequest -Method Post -Uri $Uri -Body $Body -Headers $Headers -ContentType 'application/json'
+        }
 
         if ($Response.Content) {
           $Response.Content | ConvertFrom-Json
