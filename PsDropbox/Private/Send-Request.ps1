@@ -117,7 +117,7 @@ function Send-Request {
             $ErrorRecord = [Management.Automation.ErrorRecord]::new($InvalidCredentialException, $ErrorId, $ErrorCategory, $null)
             $ErrorRecord.ErrorDetails = $ErrorDetails | ConvertTo-Json
 
-            Write-Error -ErrorRecord $ErrorRecord
+            $PSCmdlet.ThrowTerminatingError($ErrorRecord)
 
           }
 
@@ -164,7 +164,7 @@ function Send-Request {
 
       }
       catch {
-        Write-Error $_.Exception.Message
+        $PSCmdlet.ThrowTerminatingError($_)
       }
 
     } # while
