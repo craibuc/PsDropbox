@@ -6,6 +6,7 @@ function Move-DropboxItem {
         [string]$AccessToken,
 
         [Parameter(Mandatory)]
+        [Alias('Source')]
         [string]$Path,
 
         [Parameter(Mandatory)]
@@ -18,33 +19,33 @@ function Move-DropboxItem {
         [bool]$AllowSharedFolder,
 
         [Parameter()]
-        [bool]$AllowOwnershipTransfer
+        [bool]$AllowOwnershipTransfer,
+
+        [string]$SelectUser,
+        [string]$RootFolderId
     )
-    
+
     begin {
         $Headers = @{
             Authorization = "Bearer $AccessToken"
         }
     }
-    
+
     process {
-        
-        $Body = @{
+
+        $Data = @{
             from_path = $Path
             to_path = $Destination
             autorename = $AutoRename
             allow_shared_folder = $AllowSharedFolder
             allow_ownership_transfer = $AllowOwnershipTransfer
-        } | ConvertTo-Json
+        }
+
+        if ($SelectUser) {$Headers['Dropbox-API-Select-User']=$SelectUser}
+        if ($RootFolderId) {$Headers['Dropbox-API-Path-Root']=@{'.tag'='root'; root=$RootFolderId} | ConvertTo-Json -Compress}
 
         if ($PSCmdlet.ShouldProcess("$Path --> $Destination", "Move-DropboxItem")) {
-
-            $Response = Invoke-WebRequest -Uri 'https://api.dropboxapi.com/2/files/move_v2' -Method Post -Body $Body -Headers $Headers -ContentType 'application/json'
-
-            if ($Response.Content) {
-                $Response.Content | ConvertFrom-Json
-            }
-
+            Send-Request -Path 'files/move_v2' -Headers $Headers -Data $Data
         }
 
     }
