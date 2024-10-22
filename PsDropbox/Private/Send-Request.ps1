@@ -1,3 +1,19 @@
+<#
+.SYNOPSIS
+POST a request to Dropbox's API.
+
+.PARAMETER Path
+The path fragment to be added to the URI.
+
+.PARAMETER Headers
+The request's headers.
+
+.PARAMETER Data
+The data that will be JSON serialized as the request's body.
+
+.PARAMETER Retries
+The total number of attempts when a Too Many Requests [429] is encountered.
+#>
 function Send-Request {
 
   [CmdletBinding()]
@@ -15,7 +31,8 @@ function Send-Request {
   )
 
   begin {
-    
+
+    Write-Debug "$($MyInvocation.MyCommand.Module.Name).$($MyInvocation.MyCommand.Name)"
     Write-Debug "Path: $Path"
 
     $BaseUri = 'https://api.dropboxapi.com/2'
@@ -48,7 +65,9 @@ function Send-Request {
       }
       catch [Microsoft.PowerShell.Commands.HttpResponseException] {
 
-        Write-Debug $_.Exception.Message
+        Write-Debug ('Exception: {0}' -f $_.Exception.Message)
+        Write-Debug ('ErrorDetails: {0}' -f $_.ErrorDetails.Message)
+
         $ErrorDetails = $_.Exception.StatusCode -ne [System.Net.HttpStatusCode]::BadRequest ? ($_.ErrorDetails.Message | ConvertFrom-Json) : $_.ErrorDetails.Message
 
         switch ($_.Exception.StatusCode) {
@@ -98,7 +117,7 @@ function Send-Request {
             $ErrorRecord = [Management.Automation.ErrorRecord]::new($InvalidCredentialException, $ErrorId, $ErrorCategory, $null)
             $ErrorRecord.ErrorDetails = $ErrorDetails | ConvertTo-Json
 
-            $PSCmdlet.ThrowTerminatingError($ErrorRecord)
+            Write-Error -ErrorRecord $ErrorRecord
 
           }
 
@@ -129,14 +148,16 @@ function Send-Request {
           }
 
           # other 4XX/5XX errors
-          Default { 
+          Default {
+
             $ServerException = [System.Exception]::new($ErrorDetails.error_summary)
             $ErrorCategory = [System.Management.Automation.ErrorCategory]::NotSpecified
             $ErrorId = "$($MyInvocation.MyCommand.Module.Name).$($MyInvocation.MyCommand.Name) - $( $_.Exception.Message )"
             $ErrorRecord = [Management.Automation.ErrorRecord]::new($ServerException, $ErrorId, $ErrorCategory, $null)
             $ErrorRecord.ErrorDetails = $_.ErrorDetails.Message
 
-            Write-Error -ErrorRecord $ErrorRecord
+            $PSCmdlet.ThrowTerminatingError($ErrorRecord)
+
           }
 
         } # /switch
