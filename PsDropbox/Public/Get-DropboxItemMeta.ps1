@@ -52,7 +52,6 @@ function Get-DropboxItemMeta {
     if ($SelectUser) {$Headers['Dropbox-API-Select-User']=$SelectUser}
     if ($RootFolderId) {$Headers['Dropbox-API-Path-Root']=@{'.tag'='root'; root=$RootFolderId} | ConvertTo-Json -Compress}
 
-    $Content = Send-Request -Path 'files/get_metadata' -Headers $Headers -Data ( @{ path = $Path } )
-    $Content
+    Send-Request -Path 'files/get_metadata' -Headers $Headers -Data ( @{ path = $Path } )
 
 }
